@@ -5,67 +5,83 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import javax.swing.SwingUtilities;
+
 import com.google.gson.Gson;
 
+
+import javax.swing.SwingUtilities;
+
 public class App {
-    public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+    public static void main(String[] args) throws Exception {    
+        if (args.length < 2) {
+            System.err.println("Использование: java App <порт_сервера> <порт_для_отправки>");
+            return;
+        }
+
+        int serverPort = Integer.parseInt(args[0]);
+        int clientPort = Integer.parseInt(args[1]);
+
         Circle MixailKrug = new Circle();
         MixailKrug.setColor("green");
         MixailKrug.setRadius(10);
 
+        SwingUtilities.invokeLater(() -> {
+            GUI gui = new GUI();
+            try {
+                NetStream netStream = new NetStream(MixailKrug, gui.getBolshayaRazdnica(), serverPort, clientPort);
 
-        SuperJet(1, MixailKrug);
+                // Запуск серверной части в отдельном потоке
+                new Thread(() -> netStream.startServer()).start();
 
-    }
-
-    public static void SuperJet(int a, Circle MixailKrug) throws IOException {
-        if (a == 1) {
-            System.out.println("Client");
-            Socket Kuritsa = new Socket("localhost", 65432);
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(Kuritsa.getOutputStream()));
-            
-            
-            Gson gson = new Gson();
-            String json = gson.toJson(MixailKrug);
-
-            Class<?> cls = MixailKrug.getClass();
-   
-            out.write(cls.getName());
-            out.write(json);
-
-            out.flush();
-
-            Kuritsa.close();
-
-        } else if (a == 2) {
-
-            System.out.println("Server");
-
-            ServerSocket Petuh = new ServerSocket(65432);
-            Socket Korova = Petuh.accept();
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(Korova.getInputStream()));
-            String koza = in.readLine();
-
-            String[] parts = koza.split("\\{", 2); // Разделяем на 2 части
-
-            String part1 = parts[0];            // "Hello MAX!"
-            String part2 = "{" + parts[1];      // "{\"color\":\"green\",\"radius\":10}"
-            
-            System.out.println(part1 + "\n");
-
-
-            System.out.println(part2);
-
-            // Десериализация JSON
-            Gson gson = new Gson();
-            Circle obj = gson.fromJson(part2, Circle.class);
-            System.out.println("Deserialized object: " + obj);
-    
-
-            Petuh.close();
-            Korova.close();
-        }
+                // Обработка кнопки
+                gui.setButtonActionListener(event -> {
+                    try {
+                        netStream.sendData();
+                        gui.getBolshayaRazdnica().setText("Данные отправлены:\n" + netStream.getReceivedData());
+                    } catch (IOException e) {
+                        gui.getBolshayaRazdnica().setText("Ошибка при отправке данных: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                });
+            } catch (IOException e) {
+                gui.getBolshayaRazdnica().setText("Ошибка при создании NetStream: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 }
+
+// public class App {
+//     public static void main(String[] args) throws Exception {    
+
+//         Circle MixailKrug = new Circle();
+//         MixailKrug.setColor("green");
+//         MixailKrug.setRadius(10);
+
+//         SwingUtilities.invokeLater(() -> {
+//             GUI gui = new GUI();
+//             try {
+//                 NetStream netStream = new NetStream(MixailKrug, gui.getBolshayaRazdnica());
+        
+//                 // Запуск серверной части в отдельном потоке
+//                 new Thread(() -> netStream.startServer()).start();
+        
+//                 // Обработка кнопки
+//                 gui.setButtonActionListener(event -> {
+//                     try {
+//                         netStream.sendData();
+//                         gui.getBolshayaRazdnica().setText("Данные отправлены:\n" + netStream.getReceivedData());
+//                     } catch (IOException e) {
+//                         gui.getBolshayaRazdnica().setText("Ошибка при отправке данных: " + e.getMessage());
+//                         e.printStackTrace();
+//                     }
+//                 });
+//             } catch (IOException e) {
+//                 gui.getBolshayaRazdnica().setText("Ошибка при создании NetStream: " + e.getMessage());
+//                 e.printStackTrace();
+//             }
+//         });
+//     }
+// }

@@ -22,9 +22,9 @@ The `JAVA PROJECTS` view allows you to manage your dependencies. More details ca
 
 компиляция: javac -cp ../lib/gson-2.12.1.jar *.java
 
-запуск первого: java -cp .:../lib/gson-2.10.1.jar App 65432 65433
+запуск первого: java -cp .:../lib/gson-2.12.1.jar App 65432 65433
 
-запуск второго: java -cp .:../lib/gson-2.10.1.jar App 65433 65432
+запуск второго: java -cp .:../lib/gson-2.12.1.jar App 65433 65432
 
 65433 — порт, который будет использовать сервер второго экземпляра.
 

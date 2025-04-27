@@ -9,52 +9,79 @@ import com.google.gson.Gson;
 public class Client {
     private static final String HOST = "localhost";
     private static final int PORT = 8080;
+    private static Thread serverThread;
 
     public static void main(String[] args) throws Exception {
 
         GUI gui = new GUI(); // GUI создается в EDT
 
-        // try (Socket socket = new Socket(HOST, PORT);
-        //         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        //         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        //         Scanner scanner = new Scanner(System.in)) {
+        serverThread = new Thread(() -> {
+            try (Socket NeKuritsa = new Socket("localhost", PORT)) {
+                // while (true) {
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(NeKuritsa.getInputStream()))) {
 
-        //     // new Thread(() -> {
-        //     // try {
-        //     // String serverMessage;
-        //     // while ((serverMessage = in.readLine()) != null) {
-        //     // System.out.println("Сервер: " + serverMessage);
-        //     // }
-        //     // } catch (IOException e) {
-        //     // e.printStackTrace();
-        //     // }
-        //     // }).start();
+                    while (true) {
 
-        //     String userInput;
-        //     while ((userInput = scanner.nextLine()) != null) {
+                        try {
+                            String mess = in.readLine();
+                            if ("Start".equals(mess)) {
+                                System.out.println("Start: " + "\n");
 
-        //         out.println(userInput);
+                                Singleton.removeAllPerson();
+                                while (!"Stop".equals(mess = in.readLine())) {
+                                    Singleton.addPerson(Integer.parseInt(mess));
+                                    System.out.println(Integer.parseInt(mess) + "\n");
 
-        //     }
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+                                }
+                                System.out.println("Stop: " + "\n");
+
+                            } else {
+                                String className = mess;
+                                System.out.println("Получено: " + className);
+
+                                String json = in.readLine();
+                                System.out.println("Получено: " + json);
+
+                                if (className == null || json == null)
+                                    break;
+
+                                Class<?> clazz = Class.forName(className);
+                                Object obj = new Gson().fromJson(json, clazz);
+                                Singleton.addEl(obj);
+                            }
+
+                        } catch (NumberFormatException e) {
+
+                        }
+                    }
+
+                } catch (Exception e) {
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        });
+        serverThread.start();
 
     }
 
-
-    public static void client(Object obj) throws IOException {
+    public static void client(Object obj, int n) throws IOException {
         System.out.println("Client");
         Socket Kuritsa = new Socket("localhost", PORT);
+
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(Kuritsa.getOutputStream()));
 
         Gson gson = new Gson();
         String className = obj.getClass().getName();
         String json = gson.toJson(obj);
 
+        out.write(n + "\n");
         out.write(className + "\n");
         out.write(json + "\n");
         out.flush();
-        Kuritsa.close();
+        // Kuritsa.close();
     }
+
 }

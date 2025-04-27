@@ -8,6 +8,9 @@ import com.google.gson.Gson;
 public class Singleton {
 
     static List<Object> list = new ArrayList<>();
+
+    static List<Integer> listPerson = new ArrayList<>();
+
     static ComboBoxUpdateListener listener;
 
     public static void setUpdateListener(ComboBoxUpdateListener listener) {
@@ -51,10 +54,43 @@ public class Singleton {
         }
     }
 
-
     static void addEl(Object selectedObject) {
         synchronized (Singleton.list) {
             if (Singleton.list.add(selectedObject)) {
+                if (listener != null) {
+                    listener.onComboBoxUpdateNeeded();
+                }
+            }
+        }
+    }
+
+    static void removePerson(int i) {
+        synchronized (Singleton.listPerson) {
+            if (listPerson.remove(i) != null) {
+                if (listener != null) {
+                    listener.onComboBoxUpdateNeeded();
+                }
+            }
+        }
+    }
+
+    static void removeAllPerson() {
+        synchronized (Singleton.listPerson) {
+
+            for (int j = listPerson.size(); j != 0; j--) {
+                if (listPerson.remove(j) != null) {
+                }
+            }
+            if (listener != null) {
+                listener.onComboBoxUpdateNeeded();
+            }
+
+        }
+    }
+
+    static void addPerson(int i) {
+        synchronized (Singleton.listPerson) {
+            if (Singleton.listPerson.add(i)) {
                 if (listener != null) {
                     listener.onComboBoxUpdateNeeded();
                 }

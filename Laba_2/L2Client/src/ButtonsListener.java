@@ -15,11 +15,14 @@ import javax.swing.SwingUtilities;
 
 public class ButtonsListener implements ActionListener {
     private JComboBox<Object> comboBox;
-    private final DefaultComboBoxModel<Object> model;
+    private JComboBox<Object> comboBoxPerson;
 
-    public ButtonsListener(JComboBox<Object> comboBox, DefaultComboBoxModel<Object> model) {
+    
+
+    public ButtonsListener(JComboBox<Object> comboBox, JComboBox<Object> comboBoxPerson) {
         this.comboBox = comboBox;
-        this.model = model;
+        this.comboBoxPerson = comboBoxPerson;
+
     }
 
     @Override
@@ -34,11 +37,14 @@ public class ButtonsListener implements ActionListener {
         }
         if (command.equals("Отправить")) {
             int i = (int) comboBox.getSelectedItem();
+            int n = (int) comboBoxPerson.getSelectedItem();
+
             Object selectedObject = Singleton.list.get(i);
+            int person = Singleton.listPerson.get(n);
 
             if (selectedObject != null) {
                 try {
-                    Client.client(selectedObject);
+                    Client.client(selectedObject, n);
                     Singleton.removeEl(selectedObject);
                     updateClientTextArea();
                 } catch (IOException ex) {

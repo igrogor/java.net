@@ -11,10 +11,16 @@ public class GUI extends JFrame implements ComboBoxUpdateListener {
     public DefaultComboBoxModel<Object> model;
     public static JComboBox<Object> comboBox;
 
+    public DefaultComboBoxModel<Object> modelPerson;
+    public static JComboBox<Object> comboBoxPerson;
+
     GUI() {
 
         model = new DefaultComboBoxModel<>();
         comboBox = new JComboBox<>(model);
+
+        modelPerson = new DefaultComboBoxModel<>();
+        comboBoxPerson = new JComboBox<>(modelPerson);
 
         JFrame frame = new JFrame("Window");
 
@@ -27,7 +33,7 @@ public class GUI extends JFrame implements ComboBoxUpdateListener {
         JButton create = new JButton("Создать");
         JButton send = new JButton("Отправить");
 
-        ActionListener myButtonsListener = new ButtonsListener(comboBox, model);
+        ActionListener myButtonsListener = new ButtonsListener(comboBox, comboBoxPerson);
 
         create.setActionCommand("Создать");
         send.setActionCommand("Отправить");
@@ -35,9 +41,13 @@ public class GUI extends JFrame implements ComboBoxUpdateListener {
         create.addActionListener(myButtonsListener);
         send.addActionListener(myButtonsListener);
 
+        // send.addActionListener(myButtonsListenerPerson);
+
         buttonsPanel.add(create);
         buttonsPanel.add(send);
         buttonsPanel.add(comboBox);
+
+        buttonsPanel.add(comboBoxPerson);
         buttonsPanel.setVisible(true);
 
         frame.getContentPane().add(BorderLayout.NORTH, buttonsPanel);
@@ -54,11 +64,17 @@ public class GUI extends JFrame implements ComboBoxUpdateListener {
     @Override
     public void onComboBoxUpdateNeeded() {
         SwingUtilities.invokeLater(() -> {
-            model.removeAllElements();
+            modelPerson.removeAllElements();
 
             synchronized (Singleton.list) {
                 for (int i = 0; i < Singleton.list.size(); i++) {
                     model.addElement(i);
+                }
+            }
+
+            synchronized (Singleton.listPerson) {
+                for (int i = 0; i < Singleton.listPerson.size(); i++) {
+                    modelPerson.addElement(i);
                 }
             }
             textArea.setText("");

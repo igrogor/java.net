@@ -36,27 +36,56 @@ public class MultiClientServer {
             try {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
-
+                ClientHandler.updatePerson();
                 String message;
-                while ((message = in.readLine()) != null) {
-                    System.out.println("Получено: " + message);
-                    broadcast(message);
+
+                while (true) {
+                    String personLine = in.readLine();
+                    System.out.println("Получено: " + personLine);
+                    if (personLine == null)
+                        break; // Проверка конца потока
+
+                    try {
+                        int person = Integer.parseInt(personLine);
+                        String className = in.readLine();
+                        System.out.println("Получено: " + className);
+
+                        String json = in.readLine();
+                        System.out.println("Получено: " + json);
+
+                        if (className == null || json == null)
+                            break; // Проверка целостности данных
+
+                        // Отправляем данные конкретному клиенту
+                        broadcast(className, person);
+                        broadcast(json, person);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Некорректный формат номера клиента: " + personLine);
+                        break;
+                    }
                 }
+
             } catch (IOException e) {
                 System.out.println("Клиент отключен");
             } finally {
                 try {
                     socket.close();
                     clients.remove(this);
+                    ClientHandler.updatePerson();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        private void broadcast(String message) {
-            for (ClientHandler client : clients) {
-                if (client != this) {
+        // private void broadcast(String message, int i) {
+        //     clients.get(i).sendMessage(message);
+        // }
+
+        private void broadcast(String message, int i) {
+            if (i >= 0 && i < clients.size()) {
+                ClientHandler client = clients.get(i);
+                if (client != null) {
                     client.sendMessage(message);
                 }
             }
@@ -65,5 +94,39 @@ public class MultiClientServer {
         private void sendMessage(String message) {
             out.println(message);
         }
+
+        public static void updatePerson() {
+            synchronized (clients) {
+                for (int i = 0; i < clients.size(); i++) {
+                    ClientHandler client = clients.get(i);
+                    if (client.out != null) {
+                        client.out.println("Start");
+                        System.out.println("Start: " + "\n");
+
+                        for (int j = 0; j < clients.size(); j++) {
+                            client.out.println(j);
+                            System.out.println(j + "\n");
+
+                        }
+                        client.out.println("Stop");
+                        System.out.println("Stop: " + "\n");
+
+                    }
+                }
+            }
+        }
+
+        // public static void updatePerson() {
+        //     synchronized (clients) {
+        //         for (ClientHandler client : clients) {
+        //             if (client.out != null) {
+        //                 client.out.println("Start");
+        //                 clients.forEach(c -> client.out.println(clients.indexOf(c)));
+        //                 client.out.println("Stop");
+        //             }
+        //         }
+        //     }
+        // }
+
     }
 }

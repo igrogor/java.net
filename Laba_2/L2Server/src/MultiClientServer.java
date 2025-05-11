@@ -115,17 +115,5 @@ public class MultiClientServer {
         }
       }
     }
-
-    // public static void updatePerson() {
-    //     synchronized (clients) {
-    //         for (ClientHandler client : clients) {
-    //             if (client.out != null) {
-    //                 client.out.println("Start");
-    //                 clients.forEach(c -> client.out.println(clients.indexOf(c)));
-    //                 client.out.println("Stop");
-    //             }
-    //         }
-    //     }
-    // }
   }
 }

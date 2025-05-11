@@ -2,5 +2,12 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "LAB_1_JAVA/lib/gson-2.12.1.jar"
+    ],
+    "java.project.sourcePaths": [
+        "Laba_2/L2Server/src",
+        "Laba_2/L2Client/src",
+        "Laba_1/Laba_1/src",
+        "LAB_1_JAVA/src",
+        "Laba_3/src"
     ]
 }

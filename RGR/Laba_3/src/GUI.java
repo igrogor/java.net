@@ -1,6 +1,9 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+// import java.awt.event.Windowadapter;
+import javax.swing.*;
 
 public class GUI extends JFrame implements ComboBoxUpdateListener {
   static JTextArea textArea = new JTextArea();
@@ -43,6 +46,15 @@ public class GUI extends JFrame implements ComboBoxUpdateListener {
     // buttonsPanel.add(comboBox);
     // buttonsPanel.add(comboBoxPerson);
     buttonsPanel.setVisible(true);
+
+    frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    frame.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        clientHandler.disconnect();
+        System.exit(0);
+      }
+    });
 
     buttonsPanel.setLayout(new FlowLayout());
     buttonsPanel.add(create);

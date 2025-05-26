@@ -4,7 +4,8 @@ import javax.swing.*;
 import java.io.IOException;
 import java.net.*;
 import java.util.UUID;
-
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 
 public class Client {
@@ -175,5 +176,13 @@ public class Client {
 
     public String getClientId() {
         return clientId;
+    }
+
+    public void disconnect() {
+        try {
+            send(clientId + "\n" + "exit\n");
+            socket.close();
+        } catch (Exception e) {
+        }
     }
 }
